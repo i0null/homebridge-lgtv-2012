@@ -1,0 +1,30 @@
+{
+  "path": "",
+  "dependencies": {
+    "lgtv-2012": "^0.1.1",
+    "ping": "^0.2.1",
+    "util": "^0.10.3"
+  },
+  "description": "LG TV 2012 plugin for Homebridge",
+  "devDependencies": {},
+  "directories": {},
+  "engines": {
+    "homebridge": ">=0.2.0",
+    "node": ">=0.12.0"
+  },
+  "keywords": [
+    "homebridge", "homebridge-plugin",
+    "lgtv", "lgtv-2012", "homebridge-lgtv-2012"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "maintainers": [
+    {
+      "name": "Shane Kelly", "email": "i0null@gmail.com"
+    }
+  ],
+  "name": "homebridge-lgtv-2012",
+  "optionalDependencies": {},
+  "readme": "README.md",
+  "version": "0.1.2"
+}

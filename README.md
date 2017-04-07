@@ -1,12 +1,6 @@
-# Homebridge LGTv2
+# Homebridge Plugin for LG 2012 Series TVs
 
-[![NPMV](https://img.shields.io/npm/v/homebridge-lgtv2.svg?style=flat-square)](https://npmjs.org/package/homebridge-lgtv2)
-[![Travis](https://img.shields.io/travis/alessiodionisi/homebridge-lgtv2.svg?style=flat-square)](https://travis-ci.org/alessiodionisi/homebridge-lgtv2)
-[![David](https://img.shields.io/david/alessiodionisi/homebridge-lgtv2.svg?style=flat-square)](https://david-dm.org/alessiodionisi/homebridge-lgtv2)
-[![NPML](https://img.shields.io/npm/l/homebridge-lgtv2.svg?style=flat-square)](https://github.com/alessiodionisi/homebridge-lgtv2/blob/master/LICENSE)
-[![NPMD](https://img.shields.io/npm/dt/homebridge-lgtv2.svg?style=flat-square)](https://npmjs.org/package/homebridge-lgtv2)
-
-Homebridge Plugin to allow Siri to control LGTV 2012 series.
+Homebridge Plugin based off (https://npmjs.org/package/homebridge-lgtv2) to allow Siri to control LGTV 2012 series.
 
 Hacked together to work with the native IOS 10 Home App, the plugin emulates a light bulb, and maps the brightness control to volume.
 

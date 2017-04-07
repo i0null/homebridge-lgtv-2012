@@ -4,10 +4,13 @@ var false_run = false;
 var Service, Characteristic;
 var ping = require('ping');
 var inherits = require('util').inherits;
-var lgtv = require('./lgtv-2012.js').lgtv;
+var lgtv = require('lgtv-2012').lgtv;
 
 function lgtv_2012_accessory(log, config, api) {
-    this.log = log;
+    this.log = function(msg) {
+        if(this.host) msg = `TV [${this.host}]: ${msg}`;
+        log(msg);
+    }
     this.api = api;
 
     if (config) {
@@ -16,15 +19,14 @@ function lgtv_2012_accessory(log, config, api) {
         this.key = config.pairingKey;
         this.host = config.ip;
         this.port = parseInt(config.port) || 8080;
-        this.max_volume = 100 / (parseInt(config.max_volume) || 20);
-        this.on_command = String(config.on_command).toUpperCase() || 'MUTE';
 
         // set up tv object and debug flags
         this.tv = new lgtv({ 'host': this.host, 'port': this.port});
-        this.tv.debug = this.verbosity = config.debug == "true" ? true : false
+        this.tv.debug = (config.debug === true || config.debug == "true")
         this.tv.min_volume = config.min_volume || 2
-
-        this.tv.false_run = config.false_run || false
+        this.max_volume = 100 / (parseInt(config.max_volume) || 20);
+        this.on_command = String(config.on_command).toUpperCase() || 'MUTE';
+        this.tv.false_run = config.false_run == "true"
         this.powered = false
     }
 
@@ -56,36 +58,40 @@ lgtv_2012_accessory.prototype.connect = function(cb) {
             cb(tv);
         });
     } else {
-        this.log('does not appear to be powered on')
-        this.powered = false
-        cb(null)
+        this.log('Does not appear to be powered on');
+        this.powered = false;
+        cb(null);
     }
 }
 
 lgtv_2012_accessory.prototype.getState = function(cb) {
     ping.sys.probe(this.host, function(alive) {
-        cb(null, this.powered = alive);
-    }, { timeout: 1, min_reply: 1 })
+        cb(null, this.powered = alive)
+    }, { 
+        timeout: 1, 
+        min_reply: 1 
+    })
 }
 
 lgtv_2012_accessory.prototype.setState = function(toggle, cb) {
     if(!this.powered || this.tv.locked || !toggle) { 
-        this.log('Cannot change power setting at this time')
+        this.log('Unable to change power settings at this time')
         cb(null, false)
     } else {
-        this.getState((error, alive) => { this.connect((tv) => {
-            this.debug('Turning: ' + toggle? 'On':'Off')
-            if(toggle && this.on_command.length) tv.send_command(this.on_command, (err) => { cb(null, true); }) 
-            else cb(null, false)
-        }) })
+        this.getState((error, alive) => { 
+            this.connect((tv) => {
+                this.log('Turning ' + toggle?'On':'Off')
+                if(toggle) tv.send_command(this.on_command, (err) => { cb(null, true) });
+                else tv.send_command('POWER', (err) => { cb(null, true) });
+            }) 
+        })
     }
 }
 
 lgtv_2012_accessory.prototype.getVolume = function(cb) {
     this.connect((tv) => {
         tv.get_volume( (volume) => {
-            this.log('Volume is: ' + volume.level);
-            this.debug('Mute is: ' + volume.mute? 'On':'Off');
+            this.log('Volume is ' +volume.level+ ' and Mute is ' + volume.mute?'On':'Off');
             cb(null, Math.round(volume.level * this.max_volume));
         })
     })
@@ -94,7 +100,7 @@ lgtv_2012_accessory.prototype.getVolume = function(cb) {
 lgtv_2012_accessory.prototype.setVolume = function(to, cb) {
     this.connect((tv) => {
         tv.set_volume(Math.round(to / this.max_volume), (err) => {
-            //this.log('Setting Volume to ' + to + '... ' + err? 'Success':'Failure')
+            this.log('Setting Volume to ' +to+ '... ' + err?'Success':'Failure');
             cb(null, true);
         })
     })
@@ -105,9 +111,8 @@ lgtv_2012_accessory.prototype.getChannel = function(cb) {
     else {
         this.connect((tv) => {
             tv.get_channel( (channel) => {
-                var ch = parseFloat(channel);
-                this.log('Get Channel: ' + ch);
-                cb(null, ch);
+                this.log(`On Channel: #${channel.number} ${channel.title}`);
+                cb(null, channel.number)
             })
         })
     }
@@ -115,19 +120,19 @@ lgtv_2012_accessory.prototype.getChannel = function(cb) {
 
 lgtv_2012_accessory.prototype.setChannel = function(channel, cb) {
     this.connect((tv) => {
-        channel = parseInt(channel)
-        tv.set_channel(channel, (err) => {
-            this.log('Set Channel: ' + channel)
-            cb(null, err)
-        })
+        channel = parseInt(channel);
+        if(channel) tv.set_channel(channel, (err) => {
+            if(!err) this.log(`Set channel to ${channel}`);
+            cb(true, err);
+        });
     })
 }
 
 lgtv_2012_accessory.prototype.getChannelName = function(cb) {
     this.connect((tv) => {
-        tv.get_title( (channel) => {
-            this.log('on Channel Name: ' + channel)
-            cb(null, channel)
+        tv.get_channel( (channel) => {
+            this.log(`Channel: ${channel.title}`)
+            cb(null, channel.title)
         })
     })
 }
@@ -155,7 +160,7 @@ lgtv_2012_accessory.prototype.identify = function(cb) {
             })
         }
     } else {
-        this.debug('No host provided')
+        this.log('No host provided')
         cb(null, false)
     }
 }
@@ -163,7 +168,7 @@ lgtv_2012_accessory.prototype.identify = function(cb) {
 lgtv_2012_accessory.prototype.checkInterval = function(cb) {
     if (!this.host || !this.host.length) cb(null, false)
     else ping.sys.probe(this.host, function(isAlive) {
-        this.debug('Alive?: ' + (isAlive? 'Yes':'No'));
+        this.log('Alive?: ' + (isAlive?'Yes':'No'));
         cb(null, this.powered = isAlive);
     })
     //setTimeout(cb, this.checkInterval.bind(this, cb), 2000)

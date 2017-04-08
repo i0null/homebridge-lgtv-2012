@@ -12,6 +12,7 @@ function lgtv_2012_accessory(log, config, api) {
         log(msg);
     }
     this.api = api;
+    this.powered = false;
 
     if (config) {
         // import the user configuration
@@ -27,7 +28,6 @@ function lgtv_2012_accessory(log, config, api) {
         this.max_volume = 100 / (parseInt(config.max_volume) || 20);
         this.on_command = String(config.on_command).toUpperCase() || 'MUTE';
         this.tv.false_run = config.false_run == "true"
-        this.powered = false
     }
 
     this.accessory = new Service.AccessoryInformation();
@@ -66,7 +66,8 @@ lgtv_2012_accessory.prototype.connect = function(cb) {
 
 lgtv_2012_accessory.prototype.getState = function(cb) {
     ping.sys.probe(this.host, function(alive) {
-        cb(null, this.powered = alive)
+        this.powered = alive;
+        cb(null, alive);
     }, { 
         timeout: 1, 
         min_reply: 1 

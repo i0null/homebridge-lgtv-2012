@@ -67,8 +67,8 @@ lgtv_2012_accessory.prototype.connect = function(cb) {
 lgtv_2012_accessory.prototype.getState = function(cb) {
     if (!this.host || !this.host.length) cb(null, false)
     else ping.sys.probe(this.host, (isAlive) => {
-        self.powered = isAlive;
-        self.log(' is' + isAlive?'On':'Off');
+        this.powered = isAlive;
+        this.log(' is' + isAlive?'On':'Off');
         cb(null, isAlive);
     }, { timeout: 1, min_reply: 1 })
 }

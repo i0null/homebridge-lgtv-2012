@@ -65,8 +65,9 @@ lgtv_2012_accessory.prototype.connect = function(cb) {
 }
 
 lgtv_2012_accessory.prototype.getState = function(cb) {
+    var self = this;
     ping.sys.probe(this.host, function(alive) {
-        this.powered = alive;
+        self.powered = alive;
         cb(null, alive);
     }, { 
         timeout: 1, 

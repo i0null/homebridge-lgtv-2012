@@ -66,11 +66,11 @@ lgtv_2012_accessory.prototype.connect = function(cb) {
 
 lgtv_2012_accessory.prototype.getState = function(cb) {
     if (!this.host || !this.host.length) cb(null, false)
-    else ping.promise.probe(this.host).then(function(isAlive) {
+    else ping.sys.probe(this.host, (isAlive) => {
         self.powered = isAlive;
         self.log(' is' + isAlive?'On':'Off');
         cb(null, isAlive);
-    }, { timeout: 1,min_reply: 1 })
+    }, { timeout: 1, min_reply: 1 })
 }
 
 lgtv_2012_accessory.prototype.setState = function(toggle, cb) {
@@ -155,7 +155,7 @@ lgtv_2012_accessory.prototype.identify = function(cb) {
 }
 
 lgtv_2012_accessory.prototype.checkInterval = function(cb) {
-    this.getState((state) => { cb(state) });
+    this.getState((err, state) => { cb(state) });
     //setTimeout(cb, this.checkInterval.bind(this, cb), 2000)
 }
 

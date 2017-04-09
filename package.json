@@ -5,7 +5,7 @@
     "path": "",
     "dependencies": {
         "lgtv-2012": "*",
-        "ping": "^0.2.1",
+        "ping": "^0.2.2",
         "util": "^0.10.3"
     },
     "description": "Homebridge plugin for LG 2012 series TVs",
@@ -19,10 +19,7 @@
         "homebridge", "homebridge-plugin",
         "lgtv", "lgtv-2012", "homebridge-lgtv-2012"
     ],
-    "license": {
-        "type": "MIT",
-        "url": "https://www.opensource.org/licenses/mit-license.php"
-    },
+    "license": "MIT",
     "main": "index.js",
     "maintainers": [{
         "name": "Shane Kelly", "email": "i0null@gmail.com"
@@ -34,6 +31,6 @@
         "type" : "git",
         "url" : "https://github.com/i0null/homebridge-lgtv-2012.git"
     },
-    "version": "0.1.5"
+    "version": "0.1.6"
 }
 

@@ -65,14 +65,12 @@ lgtv_2012_accessory.prototype.connect = function(cb) {
 }
 
 lgtv_2012_accessory.prototype.getState = function(cb) {
-    var self = this;
-    ping.sys.probe(this.host, function(alive) {
-        self.powered = alive;
-        cb(null, alive);
-    }, { 
-        timeout: 1, 
-        min_reply: 1 
-    })
+    if (!this.host || !this.host.length) cb(null, false)
+    else ping.promise.probe(this.host).then(function(isAlive) {
+        self.powered = isAlive;
+        self.log(' is' + isAlive?'On':'Off');
+        cb(null, isAlive);
+    }, { timeout: 1,min_reply: 1 })
 }
 
 lgtv_2012_accessory.prototype.setState = function(toggle, cb) {
@@ -133,8 +131,8 @@ lgtv_2012_accessory.prototype.setChannel = function(channel, cb) {
 lgtv_2012_accessory.prototype.getChannelName = function(cb) {
     this.connect((tv) => {
         tv.get_channel( (channel) => {
-            this.log(`Channel: ${channel.title}`)
-            cb(null, channel.title)
+            this.log(`Channel: ${channel.title}`);
+            cb(null, channel.title);
         })
     })
 }
@@ -142,37 +140,22 @@ lgtv_2012_accessory.prototype.getChannelName = function(cb) {
 lgtv_2012_accessory.prototype.identify = function(cb) {
     if (this.host && this.host.length) {
         if(this.powered) {
-            if(this.key && this.key.length) {
-                this.connect((tv) => { 
-                    tv.send_command('APPS', (success) => { 
-                        this.log('Identifying by launching LG App menu')
-                        cb(null, success)
-                    })
-                })
-            } else {
-                tv.pair_request((success) => { 
-                    this.log('Performing request for TV key')
+            if(this.key && this.key.length) this.connect((tv) => {
+                tv.send_command('APPS', (success) => {
+                    this.log('Identifying by launching LG App menu');
                     cb(null, success);
                 })
-            }
-        } else {
-            this.checkInterval((alive) => { 
-                if(!alive) this.log('Sorry, device did not respond.')
-                cb(null, alive) 
-            })
-        }
-    } else {
-        this.log('No host provided')
-        cb(null, false)
-    }
+            });
+            else tv.pair_request((success) => {
+                this.log('Performing request for TV key');
+                cb(null, success);
+            });
+        } else this.checkInterval((alive) => { cb(null, alive) })
+    } else cb(null, false)
 }
 
 lgtv_2012_accessory.prototype.checkInterval = function(cb) {
-    if (!this.host || !this.host.length) cb(null, false)
-    else ping.sys.probe(this.host, function(isAlive) {
-        this.log('Alive?: ' + (isAlive?'Yes':'No'));
-        cb(null, this.powered = isAlive);
-    })
+    this.getState((state) => { cb(state) });
     //setTimeout(cb, this.checkInterval.bind(this, cb), 2000)
 }
 

@@ -24,6 +24,7 @@ Setting "false_run" to true in the config can trys prevent the channel changes w
 
 ## Get TV Pairing key
 Replacing 172.16.0.10 with your TV's ip
+
 ```node -e "ip = '172.16.0.10'; lg = require('lgtv-2012').lgtv; tv = new lg({host: ip}); tv.pair_request()"```
 
 ## Configuration example

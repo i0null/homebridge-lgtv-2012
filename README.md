@@ -20,10 +20,13 @@ Setting "false_run" to true in the config can trys prevent the channel changes w
 
 
 ## Install
-```npm install -g homebridge-lgtv-2012```
+```
+npm install -g homebridge-lgtv-2012
+```
 
 ## Get TV Pairing key
-```bash 
+Replacing 172.16.0.10 with your TV's ip
+```
 cd $NODE_PATH/homebridge-lgtv-2012
 node -e "ip = '172.16.0.10'; lg = require('lgtv-2012').lgtv; tv = new lg({host: ip}); tv.pair_request()"
 ```

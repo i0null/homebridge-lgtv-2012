@@ -22,10 +22,10 @@ Setting "false_run" to true in the config can trys prevent the channel changes w
 ## Install
 ```npm install -g homebridge-lgtv-2012```
 
-
 ## Get TV Pairing key
-```TV_IP=172.16.0.10 node -e "lg = require('lgtv-2012').lgtv; tv = new lg({host: '$TV_IP'}); tv.pair_request()"```
-
+```bash 
+node -e "ip = '172.16.0.10'; lg = require('lgtv-2012').lgtv; tv = new lg({host: ip}); tv.pair_request()"
+``
 
 ## Configuration example
 ```json
@@ -52,8 +52,7 @@ Name of your accessory
 - `ip` [required]
 IP address of your tv
 - `pairingKey` [required]
-The pairing key of the TV
-
+Must be provided to control the TV. If not provided, pairing key should be shown on the tv during accessory setup.
 - `max_volume` [optional]
 Upper Volume Limit (default: 20)
 - `min_volume` [optional]

@@ -74,7 +74,7 @@ lgtv_2012_accessory.prototype.getState = function(cb) {
 }
 
 lgtv_2012_accessory.prototype.setState = function(toggle, cb) {
-    if(!this.powered || this.tv.locked || !toggle) { 
+    if(!this.powered || this.tv.locked) { 
         this.log('Unable to change power settings at this time')
         cb(null, false)
     } else {

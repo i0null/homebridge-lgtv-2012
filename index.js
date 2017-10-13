@@ -68,7 +68,7 @@ lgtv_2012_accessory.prototype.getState = function(cb) {
     if (!this.host || !this.host.length) cb(null, false)
     else ping.sys.probe(this.host, (isAlive) => {
         this.powered = isAlive;
-        this.log(' is' + isAlive?'On':'Off');
+        this.log('is ' + (isAlive?'On':'Off')); //modified
         cb(null, isAlive);
     }, { timeout: 1, min_reply: 1 })
 }
@@ -78,23 +78,27 @@ lgtv_2012_accessory.prototype.setState = function(toggle, cb) {
         this.log('Unable to change power settings at this time')
         cb(null, false)
     } else {
-        this.getState((error, alive) => { 
+        this.getState((error, alive) => {
             this.connect((tv) => {
                 this.log('Turning ' + toggle?'On':'Off')
                 if(toggle) tv.send_command(this.on_command, (err) => { cb(null, true) });
                 else tv.send_command('POWER', (err) => { cb(null, true) });
-            }) 
+            })
         })
     }
 }
 
 lgtv_2012_accessory.prototype.getVolume = function(cb) {
-    this.connect((tv) => {
-        tv.get_volume( (volume) => {
-            this.log('Volume is ' +volume.level+ ' and Mute is ' + volume.mute?'On':'Off');
-            cb(null, Math.round(volume.level * this.max_volume));
-        })
+    if(!this.powered) cb(null, 0); //modified
+    else {
+        this.connect((tv) => {
+            tv.get_volume((volume) => {
+            this.log('Volume is ' + volume.level + ' and Mute is ' + volume.mute ? 'On' : 'Off');
+        cb(null, Math.round(volume.level * this.max_volume));
     })
+    })
+    }
+
 }
 
 lgtv_2012_accessory.prototype.setVolume = function(to, cb) {
@@ -107,7 +111,8 @@ lgtv_2012_accessory.prototype.setVolume = function(to, cb) {
 }
 
 lgtv_2012_accessory.prototype.getChannel = function(cb) {
-    if (!this.host || !this.host.length) cb(null, false)
+
+    if (!this.host || !this.host.length || !this.powered) cb(null, false) //modified
     else {
         this.connect((tv) => {
             tv.get_channel( (channel) => {
@@ -129,6 +134,7 @@ lgtv_2012_accessory.prototype.setChannel = function(channel, cb) {
 }
 
 lgtv_2012_accessory.prototype.getChannelName = function(cb) {
+
     this.connect((tv) => {
         tv.get_channel( (channel) => {
             this.log(`Channel: ${channel.title}`);

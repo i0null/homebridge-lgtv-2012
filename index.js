@@ -52,7 +52,6 @@ function lgtv_2012_accessory(log, config, api) {
 }
 
 lgtv_2012_accessory.prototype.connect = function(cb) {
-    console.log('ilk burada cagiriliyor..');
     if (this.host && this.host.length && this.port) {
         this.tv.new_session(this.key, (tv) => {
             this.powered = Boolean(tv);
